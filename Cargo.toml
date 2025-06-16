@@ -1,0 +1,44 @@
+[package]
+name = "ps1g"
+version = "0.0.1"
+edition = "2024"
+autoexamples = false
+autobenches = false
+description = "prompt generator"
+documentation = "https://docs.rs/ps1g"
+readme = "README.md"
+repository = "https://github.com/gabrielfalcao/ps1g"
+homepage = "https://github.com/gabrielfalcao/ps1g"
+license = "MIT OR Apache-2.0"
+keywords = ["prompt", "ps1", "unix", "shell", "bash"]
+authors = ["Gabriel DeMoura <gabrielteratos@gmail.com>"]
+
+[package.metadata]
+cargo-args = ["-Zmtime-on-use", "-Zavoid-dev-deps", "-Zcustom_mir"]
+
+[lib]
+name = "ps1g"
+path = "src/lib.rs"
+
+
+[[bin]]
+name = "ps1"
+path = "./ps1.rs"
+
+
+[dependencies]
+chrono = "0.4.41"
+clap = { version = "4.5.36", features = ["derive", "env", "string", "unicode", "wrap_help"] }
+console = "0.15.11"
+git2 = "0.20.1"
+iocore = "3.0.3"
+strip-ansi-escapes = "0.2.0"
+pest = { version = "2.8.0", features = ["pretty-print"] }
+pest_derive = "2.8.0"
+sanitation = "1.0.3"
+serde = { version = "1.0.219", features = ["derive"] }
+toml = "0.8.20"
+unique-pointer = "0.5.0"
+
+[dev-dependencies]
+k9 = "0.12.0"

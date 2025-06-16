@@ -1,0 +1,83 @@
+ps1                                              = ${ SOI ~ token* ~ EOI}
+
+color                                            = @{ ASCII_DIGIT{1,3}            }
+string                                           = @{ !(replacement) ~ (ASCII_ALPHANUMERIC | "_")+ }
+
+vcs                                              = @{ !(fg_color ~ bg_color ~ reset) ~ ("git" | "hg") }
+vcs_param                                        = ${ vcs ~ ":" ~ string }
+
+key_value_param                                  = ${ string ~ ":" ~ string }
+
+fg_color                                         = @{ ("fg:" ~ color) }
+bg_color                                         = @{ ("bg:" ~ color) }
+reset                                            = @{ "reset" }
+replacement                                      = ${ "{" ~ (fg_color | color | bg_color | reset | vcs_param | key_value_param | string )  ~ "}"}
+unhandled                                        = ${ (!(replacement) ~ !(variable)) ~ (string | "@" | WHITESPACE | ":" | ASCII_ALPHANUMERIC)+ }
+// // unhandled                                        = ${  (!(replacement) ~ !(variable)) ~ (string | "@" | WHITESPACE | (!("{") ~ !escape_variable ~ !("}") ~ ANY)+)+ }
+// // replacement                                      = ${ "{" ~ ((fg_color | color | bg_color | reset) | string | vcs_param ) ~ "}"}
+
+token                                            = _{ replacement | variable | unhandled }
+WHITESPACE                                       = _{ " " | "\t" | "\n" }
+
+escape_variable                                  = @{"\\"}
+strftime_format                                  = @{(!("}") ~ ANY+)}
+
+// https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html
+
+variable_code_bell                               = @{ "a" }                                                                           // `\a` - A bell character.
+variable_code_date_weekday                       = @{ "d" }                                                                           // `\d` - The date, in "Weekday Month Date" format (e.g., "Tue May 26").
+variable_code_ascii_octal_code                   = @{ ASCII_OCT_DIGIT }                                                               // `\nnn` - The character whose ASCII code is the octal value nnn.
+variable_code_strftime                           = @{ "D" ~ "{" ~ strftime_format ~ "}" }                                             // `\D{format}` - The format is passed to strftime(3) and the result is inserted into the prompt string; an empty format results in a locale-specific time representation. The braces are required.
+variable_code_escape_character                   = @{ "e" }                                                                           // `\e` - An escape character.
+variable_code_hostname_short                     = @{ "h" }                                                                           // `\h` - The hostname, up to the first ‘.’.
+variable_code_hostname                           = @{ "H" }                                                                           // `\H` - The hostname.
+variable_code_jobs_count                         = @{ "j" }                                                                           // `\j` - The number of jobs currently managed by the shell.
+variable_code_shell_device_name                  = @{ "l" }                                                                           // `\l` - The basename of the shell’s terminal device name.
+variable_code_newline                            = @{ "n" }                                                                           // `\n` - A newline.
+variable_code_carriage_return                    = @{ "r" }                                                                           // `\r` - A carriage return.
+variable_code_shell_name                         = @{ "s" }                                                                           // `\s` - The name of the shell, the basename of $0 (the portion following the final slash).
+variable_code_time_24h_format                    = @{ "t" }                                                                           // `\t` - The time, in 24-hour HH:MM:SS format.
+variable_code_time_12h_format                    = @{ "T" }                                                                           // `\T` - The time, in 12-hour HH:MM:SS format.
+variable_code_time_12h_ampm                      = @{ "@" }                                                                           // `\@` - The time, in 12-hour am/pm format.
+variable_code_time_24h_short                     = @{ "A" }                                                                           // `\A` - The time, in 24-hour HH:MM format.
+variable_code_username                           = @{ "u" }                                                                           // `\u` - The username of the current user.
+variable_code_bash_version                       = @{ "v" }                                                                           // `\v` - The version of Bash (e.g., 2.00)
+variable_code_bash_version_full                  = @{ "V" }                                                                           // `\V` - The release of Bash, version + patchlevel (e.g., 2.00.0)
+variable_code_pwd_short                          = @{ "w" }                                                                           // `\w` - The value of the PWD shell variable ($PWD), with $HOME abbreviated with a tilde (uses the $PROMPT_DIRTRIM variable).
+variable_code_pwd_long                           = @{ "W" }                                                                           // `\W` - The basename of $PWD, with $HOME abbreviated with a tilde.
+variable_code_history_number                     = @{ "!" }                                                                           // `\!` - The history number of this command.
+variable_code_command_number                     = @{ "#" }                                                                           // `\#` - The command number of this command.
+variable_code_prompt_end                         = @{ "$" }                                                                           // `\$` - If the effective uid is 0, #, otherwise $.
+variable_code_backslash                          = @{ "\\" }                                                                          // `\\` - A backslash.
+variable_code_begin_nonprinting                  = @{ "[" }                                                                           // `\[` - Begin a sequence of non-printing characters. This could be used to embed a terminal control sequence into the prompt.
+variable_code_end_nonprinting                    = @{ "]" }                                                                           // `\]` - End a sequence of non-printing characters.
+
+variable_bell                                    = ${ escape_variable ~ variable_code_bell }                                          // `\a` - A bell character.
+variable_date_weekday                            = ${ escape_variable ~ variable_code_date_weekday }                                  // `\d` - The date, in "Weekday Month Date" format (e.g., "Tue May 26").
+variable_ascii_octal_code                        = ${ escape_variable ~ variable_code_ascii_octal_code }                              // `\nnn` - The character whose ASCII code is the octal value nnn.
+variable_strftime                                = ${ escape_variable ~ variable_code_strftime }                                      // `\D{format}` - The format is passed to strftime(3) and the result is inserted into the prompt string; an empty format results in a locale-specific time representation. The braces are required.
+variable_escape_character                        = ${ escape_variable ~ variable_code_escape_character }                              // `\e` - An escape character.
+variable_hostname_short                          = ${ escape_variable ~ variable_code_hostname_short }                                // `\h` - The hostname, up to the first ‘.’.
+variable_hostname                                = ${ escape_variable ~ variable_code_hostname }                                      // `\H` - The hostname.
+variable_jobs_count                              = ${ escape_variable ~ variable_code_jobs_count }                                    // `\j` - The number of jobs currently managed by the shell.
+variable_shell_device_name                       = ${ escape_variable ~ variable_code_shell_device_name }                             // `\l` - The basename of the shell’s terminal device name.
+variable_newline                                 = ${ escape_variable ~ variable_code_newline }                                       // `\n` - A newline.
+variable_carriage_return                         = ${ escape_variable ~ variable_code_carriage_return }                               // `\r` - A carriage return.
+variable_shell_name                              = ${ escape_variable ~ variable_code_shell_name }                                    // `\s` - The name of the shell, the basename of $0 (the portion following the final slash).
+variable_time_24h_format                         = ${ escape_variable ~ variable_code_time_24h_format }                               // `\t` - The time, in 24-hour HH:MM:SS format.
+variable_time_12h_format                         = ${ escape_variable ~ variable_code_time_12h_format }                               // `\T` - The time, in 12-hour HH:MM:SS format.
+variable_time_12h_ampm                           = ${ escape_variable ~ variable_code_time_12h_ampm }                                 // `\@` - The time, in 12-hour am/pm format.
+variable_time_24h_short                          = ${ escape_variable ~ variable_code_time_24h_short }                                // `\A` - The time, in 24-hour HH:MM format.
+variable_username                                = ${ escape_variable ~ variable_code_username }                                      // `\u` - The username of the current user.
+variable_bash_version                            = ${ escape_variable ~ variable_code_bash_version }                                  // `\v` - The version of Bash (e.g., 2.00)
+variable_bash_version_full                       = ${ escape_variable ~ variable_code_bash_version_full }                             // `\V` - The release of Bash, version + patchlevel (e.g., 2.00.0)
+variable_pwd_short                               = ${ escape_variable ~ variable_code_pwd_short }                                     // `\w` - The value of the PWD shell variable ($PWD), with $HOME abbreviated with a tilde (uses the $PROMPT_DIRTRIM variable).
+variable_pwd_long                                = ${ escape_variable ~ variable_code_pwd_long }                                      // `\W` - The basename of $PWD, with $HOME abbreviated with a tilde.
+variable_history_number                          = ${ escape_variable ~ variable_code_history_number }                                // `\!` - The history number of this command.
+variable_command_number                          = ${ escape_variable ~ variable_code_command_number }                                // `\#` - The command number of this command.
+variable_prompt_end                              = ${ variable_code_prompt_end | (escape_variable ~ variable_code_prompt_end) }       // `\$` - If the effective uid is 0, #, otherwise $.
+variable_backslash                               = ${ escape_variable ~ variable_code_backslash }                                     // `\\` - A backslash.
+variable_begin_nonprinting                       = ${ escape_variable ~ variable_code_begin_nonprinting }                             // `\[` - Begin a sequence of non-printing characters. This could be used to embed a terminal control sequence into the prompt.
+variable_end_nonprinting                         = ${ escape_variable ~ variable_code_end_nonprinting }                               // `\]` - End a sequence of non-printing characters.
+
+variable                                         = ${ variable_bell | variable_date_weekday | variable_strftime | variable_escape_character | variable_hostname_short | variable_hostname | variable_jobs_count | variable_shell_device_name | variable_newline | variable_carriage_return | variable_shell_name | variable_time_24h_format | variable_time_12h_format | variable_time_12h_ampm | variable_time_24h_short | variable_username | variable_bash_version | variable_bash_version_full | variable_pwd_short | variable_pwd_long | variable_history_number | variable_command_number | variable_prompt_end | variable_ascii_octal_code | variable_backslash | variable_begin_nonprinting | variable_end_nonprinting }
