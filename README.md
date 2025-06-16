@@ -17,14 +17,18 @@ ps1='{220}\u{137}:{220}{cwd:name}{37}{git:branch}{220}${reset}'
 eval "$(~/.cargo/bin/ps1 --env)"
 ```
 
-
 ## Syntax
 
 ### ANSI Colors
 
-`{fg:number}` or `{number}` where *number* is 0 - 255 - set foreground color
-`{bg:number}` where *number* is 0 - 255 - set background color
-`{reset}` reset colors
+set foreground color
+> `{fg:number}` or `{number}` where *number* is 0 - 255 -
+
+set background color
+> `{bg:number}` where *number* is 0 - 255 -
+
+reset colors
+> `{reset}`
 
 
 ### Current Work Dir Name
@@ -35,6 +39,11 @@ eval "$(~/.cargo/bin/ps1 --env)"
 ### Git Branch
 
 `{git:branch}`
+
+
+## Demo
+
+[![asciicast](https://asciinema.org/a/vZiqWFL4GshfqAzZcrmhlPUAx.svg)](https://asciinema.org/a/vZiqWFL4GshfqAzZcrmhlPUAx)
 
 
 ## How it works
